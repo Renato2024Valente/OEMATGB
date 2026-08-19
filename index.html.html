@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07182e">
+  <title>Corretor de Gabaritos - Português e Matemática</title>
+  <style>
+    :root{
+      --navy:#07182e;--blue:#0b4f8a;--blue2:#1976d2;--cyan:#1fc8db;
+      --ink:#172033;--muted:#64748b;--line:#d9e2ec;--bg:#f2f6fa;--card:#fff;
+      --ok:#137a47;--ok-bg:#e9f8f0;--bad:#bd2c2c;--bad-bg:#fff0f0;
+      --warn:#a75b00;--warn-bg:#fff7e6;--shadow:0 14px 36px rgba(7,24,46,.11);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Arial,Helvetica,sans-serif}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    .topbar{background:linear-gradient(120deg,var(--navy),#0a3762 58%,#0b6190);color:#fff;padding:22px 20px 60px;position:relative;overflow:hidden}
+    .topbar:after{content:"";position:absolute;width:330px;height:330px;border:70px solid rgba(255,255,255,.05);border-radius:50%;right:-100px;top:-210px}
+    .header-inner{max-width:1220px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px;position:relative;z-index:1}
+    .brand{display:flex;gap:14px;align-items:center}
+    .brand-mark{width:56px;height:56px;border-radius:15px;background:#fff;color:var(--blue);display:grid;place-items:center;font-weight:900;font-size:24px;box-shadow:0 8px 28px rgba(0,0,0,.18)}
+    .brand h1{font-size:24px;line-height:1.12;margin:0 0 4px}.brand p{margin:0;color:#c9e7ff}
+    .model-badge{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);padding:9px 14px;border-radius:999px;font-weight:700;white-space:nowrap}
+    .shell{max-width:1220px;margin:-37px auto 46px;padding:0 18px;position:relative;z-index:2}
+    .nav{background:#fff;border-radius:16px;padding:8px;box-shadow:var(--shadow);display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:18px}
+    .nav button{border:0;background:transparent;border-radius:12px;padding:13px 12px;color:var(--muted);font-weight:800;display:flex;align-items:center;justify-content:center;gap:9px}
+    .nav button.active{background:var(--navy);color:#fff;box-shadow:0 7px 18px rgba(7,24,46,.2)}
+    .stepno{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:rgba(100,116,139,.12);font-size:12px}
+    .active .stepno{background:#fff;color:var(--navy)}
+    .panel{display:none}.panel.active{display:block}
+    .card{background:var(--card);border:1px solid rgba(217,226,236,.9);border-radius:var(--radius);box-shadow:0 8px 28px rgba(7,24,46,.07);padding:22px;margin-bottom:18px}
+    .card-title{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}
+    .card-title h2,.card-title h3{margin:0 0 4px}.card-title p{margin:0;color:var(--muted)}
+    .status-pill{padding:7px 11px;border-radius:999px;background:#edf2f7;color:#526274;font-size:12px;font-weight:800;white-space:nowrap}
+    .status-pill.ok{background:var(--ok-bg);color:var(--ok)}
+    .callout{display:flex;gap:12px;padding:14px;border-radius:14px;background:#eef7ff;border:1px solid #c9e7ff;margin-bottom:18px;color:#244662}
+    .callout.warn{background:var(--warn-bg);border-color:#f2d59a;color:#714300}
+    .callout b{display:block;margin-bottom:2px}.callout-icon{font-size:21px;line-height:1}
+    .actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+    .btn{border:0;border-radius:11px;padding:11px 15px;font-weight:800;transition:.16s transform,.16s box-shadow,.16s opacity;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+    .btn:hover{transform:translateY(-1px)}.btn:disabled{opacity:.48;cursor:not-allowed;transform:none}
+    .btn.primary{background:var(--blue2);color:#fff;box-shadow:0 7px 18px rgba(25,118,210,.22)}
+    .btn.dark{background:var(--navy);color:#fff}.btn.success{background:var(--ok);color:#fff}.btn.danger{background:#fff;color:var(--bad);border:1px solid #efb6b6}
+    .btn.ghost{background:#edf2f7;color:#334155}.btn.small{padding:7px 10px;border-radius:9px;font-size:13px}
+    .hidden{display:none!important}
+    .scanner{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#f8fafc;margin:16px 0}
+    .scanner-head{padding:13px 15px;background:#eef3f8;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+    .scanner-head strong{display:block}.scanner-head small{color:var(--muted)}
+    .scanner-stage{padding:14px;min-height:240px;display:grid;place-items:center;position:relative;background-color:#dfe7ee;background-image:linear-gradient(45deg,#e9eff4 25%,transparent 25%),linear-gradient(-45deg,#e9eff4 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e9eff4 75%),linear-gradient(-45deg,transparent 75%,#e9eff4 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0}
+    .scanner-stage canvas{display:block;max-width:100%;max-height:68vh;background:#fff;box-shadow:0 7px 28px rgba(0,0,0,.18);touch-action:none}
+    .empty-scan{text-align:center;color:var(--muted);padding:32px 16px}.empty-scan .big{font-size:42px;margin-bottom:8px}
+    .scanner-controls{padding:13px 15px;background:#fff;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .threshold{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px}.threshold input{width:135px}.threshold output{min-width:42px;font-weight:800;color:var(--ink)}
+    .hintbar{padding:9px 14px;background:#07182e;color:#e5f2ff;font-size:13px;text-align:center}
+    .answer-grid{display:grid;grid-template-columns:repeat(2,minmax(340px,1fr));gap:14px;overflow-x:auto;padding-bottom:4px}.answer-column{display:grid;gap:9px;align-content:start}
+    .qrow{border:1px solid var(--line);border-radius:12px;padding:9px 11px;display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:8px;background:#fff}
+    .qno{font-weight:900;color:var(--navy);font-size:16px}.choices{display:flex;gap:6px;flex-wrap:wrap}
+    .choice{width:34px;height:34px;border:1px solid #bdcad7;border-radius:50%;background:#fff;color:#334155;font-weight:900;padding:0}
+    .choice:hover{border-color:var(--blue2);color:var(--blue2)}.choice.selected{background:var(--blue2);border-color:var(--blue2);color:#fff;box-shadow:0 4px 10px rgba(25,118,210,.23)}
+    .choice.clear{border-radius:9px;width:auto;padding:0 9px;font-size:12px}.choice.invalid{background:var(--warn-bg);border-color:#e3a340;color:#8a4c00}
+    .qmeta{font-size:12px;color:var(--muted);text-align:right;min-width:76px}.qmeta.ok{color:var(--ok);font-weight:800}.qmeta.bad{color:var(--bad);font-weight:800}.qmeta.warn{color:var(--warn);font-weight:800}
+    .key-footer{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);flex-wrap:wrap}
+    .progress-text{font-weight:800;color:var(--muted)}
+    .subject-tabs{display:grid;grid-template-columns:repeat(2,minmax(190px,1fr));gap:10px;margin:0 0 18px}.subject-tab{border:2px solid var(--line);background:#fff;color:var(--ink);border-radius:13px;padding:12px 14px;text-align:left;font-weight:900}.subject-tab span{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-top:2px}.subject-tab.active{border-color:var(--blue2);background:#eef7ff;color:var(--blue)}.subject-tab.done:after{content:" ✓";color:var(--ok)}.subject-tab:disabled{opacity:.48;cursor:not-allowed}.subject-tab:disabled:after{content:" • desativado";color:var(--muted);font-size:11px}
+    .enable-box{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 15px;margin:0 0 14px;border:1px solid #b9dcfa;background:#eef7ff;border-radius:13px}.enable-box label{display:flex;align-items:center;gap:10px;font-weight:900;color:var(--blue)}.enable-box input{width:20px;height:20px;accent-color:var(--blue2)}.enable-box small{color:var(--muted)}
+    .subject-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:13px}.subject-score{padding:12px 14px;border:1px solid var(--line);border-radius:13px;background:#f8fafc}.subject-score span{display:block;color:var(--muted);font-size:12px;font-weight:800}.subject-score strong{font-size:18px;color:var(--blue)}
+    .form-grid{display:grid;grid-template-columns:2fr 1fr 1.4fr;gap:12px}
+    label.field{display:block;color:#475569;font-weight:700;font-size:13px}label.field span{display:block;margin-bottom:6px}
+    .input{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:11px 12px;background:#fff;color:var(--ink);outline:none}.input:focus{border-color:var(--blue2);box-shadow:0 0 0 3px rgba(25,118,210,.12)}
+    .score-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+    .metric{border-radius:14px;padding:14px;background:#f4f7fa;border:1px solid #e1e8ef}.metric span{display:block;color:var(--muted);font-size:12px;font-weight:700}.metric strong{font-size:23px;line-height:1.2}.metric.ok{background:var(--ok-bg);border-color:#bce7cf}.metric.bad{background:var(--bad-bg);border-color:#f2c4c4}.metric.main{background:var(--navy);color:#fff}.metric.main span{color:#c9d9e8}
+    .results-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+    .summary-box{padding:17px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(145deg,#fff,#f4f7fa)}.summary-box span{display:block;color:var(--muted);font-size:12px;font-weight:700}.summary-box strong{font-size:25px}
+    .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:13px}
+    table{width:100%;border-collapse:collapse;background:#fff}th,td{padding:11px 12px;border-bottom:1px solid #e7edf3;text-align:left;white-space:nowrap}th{background:#eef3f8;color:#445468;font-size:12px;text-transform:uppercase;letter-spacing:.03em}tbody tr:hover{background:#f8fbfd}tbody tr:last-child td{border-bottom:0}
+    .grade{font-weight:900;color:var(--blue)}.tag{display:inline-block;padding:4px 8px;border-radius:999px;background:#edf2f7;font-size:12px;font-weight:800}.tag.ok{background:var(--ok-bg);color:var(--ok)}.tag.bad{background:var(--bad-bg);color:var(--bad)}
+    .chart-list{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:14px}.chart-row{display:grid;grid-template-columns:42px 1fr 78px;align-items:center;gap:9px}.bar{height:10px;background:#e6edf3;border-radius:99px;overflow:hidden}.bar>i{height:100%;display:block;background:linear-gradient(90deg,#ef5350,#ff9800);border-radius:99px}.chart-row small{text-align:right;color:var(--muted)}
+    .room-info{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;align-items:center;padding:14px 16px;margin:0 0 16px;border:1px solid #b9dcfa;background:#eef7ff;border-radius:14px}.room-info.hidden{display:none}.room-info>span{grid-row:1/3;font-size:10px;letter-spacing:.12em;color:var(--blue2);font-weight:900}.room-info strong{font-size:17px}.room-info small{color:var(--muted)}
+    .room-list{display:grid;gap:10px}.room-card{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}.room-card>summary{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;padding:15px;cursor:pointer;list-style:none}.room-card>summary strong,.room-card>summary span{display:block}.room-card>summary span{font-size:12px;color:var(--muted);margin-top:3px}.room-average{text-align:right}.room-average b{font-size:19px;color:var(--blue2)}.room-average small{display:block;color:var(--muted)}.room-body{padding:14px;border-top:1px solid var(--line);background:#fbfdff}.room-body .actions{margin-bottom:12px}.room-students{display:grid;grid-template-columns:2fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}.room-students>*{padding:9px 10px;background:#fff}.room-students .head{background:#eef3f8;font-size:11px;text-transform:uppercase;font-weight:900;color:#526274}
+    .modal{position:fixed;inset:0;background:rgba(4,15,29,.72);display:none;align-items:center;justify-content:center;padding:18px;z-index:100}.modal.open{display:flex}.modal-box{background:#fff;border-radius:18px;max-width:920px;width:100%;max-height:92vh;overflow:auto;box-shadow:0 30px 90px rgba(0,0,0,.35)}.modal-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;z-index:2}.modal-head h3{margin:0}.modal-body{padding:20px}.close{border:0;background:#edf2f7;width:36px;height:36px;border-radius:50%;font-weight:900}
+    .camera-box{max-width:760px;background:#06111f;color:#fff;overflow:hidden}.camera-box .modal-head{background:#07182e;color:#fff;border-color:#20344b}.camera-box .close{background:#1a334e;color:#fff}.camera-view{position:relative;min-height:58vh;display:grid;place-items:center;background:#000;overflow:hidden}.camera-view video{width:100%;height:68vh;object-fit:cover;display:block}.camera-guide{position:absolute;width:min(70%,430px);aspect-ratio:.66;border:4px solid #48e47d;border-radius:14px;box-shadow:0 0 0 9999px rgba(0,0,0,.38),0 0 25px rgba(72,228,125,.7);pointer-events:none}.camera-guide:before,.camera-guide:after{content:"";position:absolute;inset:12px;border:1px dashed rgba(255,255,255,.7);border-radius:8px}.camera-guide:after{inset:auto 12%;top:50%;border:0;border-top:2px solid rgba(255,255,255,.75)}.camera-tip{position:absolute;top:12px;left:12px;right:12px;text-align:center;background:rgba(0,0,0,.72);padding:9px;border-radius:10px;font-size:13px;font-weight:800}.camera-actions{display:grid;grid-template-columns:1fr 2fr;gap:10px;padding:14px;background:#07182e}.camera-actions .btn{min-height:48px}
+    .toast{position:fixed;right:18px;bottom:18px;background:var(--navy);color:#fff;padding:13px 16px;border-radius:12px;box-shadow:0 12px 36px rgba(0,0,0,.24);transform:translateY(90px);opacity:0;transition:.25s;z-index:200;max-width:420px}.toast.show{transform:translateY(0);opacity:1}.toast.ok{background:var(--ok)}.toast.bad{background:var(--bad)}
+    .help-list{margin:0;padding-left:20px}.help-list li{margin:7px 0}.legend{display:flex;gap:13px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin:10px 0}.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px}.dot.blue{background:#1976d2}.dot.green{background:#24a15f}.dot.red{background:#e53935}.dot.orange{background:#f59e0b}
+    footer{text-align:center;color:#718096;padding:12px;font-size:12px}
+    #printReport{display:none}
+    @media(max-width:820px){.header-inner{align-items:flex-start}.model-badge{display:none}.brand h1{font-size:20px}.nav button{font-size:13px}.chart-list{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.score-strip{grid-template-columns:repeat(2,1fr)}.score-strip .main{grid-column:span 2}.results-summary{grid-template-columns:repeat(2,1fr)}.subject-summary{grid-template-columns:1fr}.threshold{width:100%;margin-left:0}.threshold input{flex:1}}
+    @media(max-width:520px){.topbar{padding:17px 12px 53px}.shell{padding:0 10px}.brand-mark{width:46px;height:46px}.brand p{font-size:12px}.nav{gap:3px}.nav button{padding:11px 5px;font-size:11px;gap:4px}.stepno{width:20px;height:20px}.card{padding:15px;border-radius:14px}.card-title{display:block}.status-pill{display:inline-block;margin-top:8px}.results-summary{grid-template-columns:1fr 1fr}.actions .btn{flex:1}.qrow{padding:8px}.choice{width:32px;height:32px}.scanner-stage{padding:8px}.score-strip{gap:7px}.metric{padding:11px}.metric strong{font-size:20px}}
+    @media print{
+      @page{size:A4;margin:12mm}body{background:#fff;font-size:11pt}.topbar,.shell,footer,.modal,.toast{display:none!important}#printReport{display:block!important;color:#111}#printReport h1{font-size:18pt;margin:0 0 4px}#printReport h2{font-size:14pt;margin:18px 0 7px}.print-meta{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;border:1px solid #aaa;padding:9px;margin:12px 0}.print-scores{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}.print-scores div{border:1px solid #aaa;padding:8px}.print-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(13,auto);grid-auto-flow:column;gap:0 16px}.print-q{display:grid;grid-template-columns:34px 1fr 1fr 1fr;padding:4px 3px;border-bottom:1px solid #ddd}.print-ok{color:#08723d;font-weight:bold}.print-bad{color:#b21f1f;font-weight:bold}table{font-size:9pt}th,td{padding:5px}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="header-inner">
+      <div class="brand"><div class="brand-mark">✓</div><div><h1>Corretor de Gabaritos</h1><p>Matemática (27–52) • Português opcional (1–26)</p></div></div>
+      <div class="model-badge">Matemática obrigatória • Português opcional • A–D</div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <nav class="nav" aria-label="Etapas">
+      <button class="active" data-tab="key"><span class="stepno">1</span>Gabarito oficial</button>
+      <button data-tab="student"><span class="stepno">2</span>Corrigir aluno</button>
+      <button data-tab="results"><span class="stepno">3</span>Resultados</button>
+    </nav>
+
+    <section id="panel-key" class="panel active">
+      <div class="card">
+        <div class="card-title"><div><h2>1. Cadastre o gabarito oficial</h2><p>Matemática é a primeira opção. Habilite Português somente quando precisar.</p></div><span id="keyStatus" class="status-pill">Matemática pendente</span></div>
+        <div class="enable-box"><label><input id="enablePortuguese" type="checkbox"> Habilitar Português (questões 1 a 26)</label><small id="portugueseModeText">Desativado: o sistema corrige e salva somente Matemática.</small></div>
+        <div class="subject-tabs" id="keySubjectTabs"><button class="subject-tab active" data-keysubject="math">Matemática<span>Questões 27 a 52</span></button><button class="subject-tab" data-keysubject="portuguese" disabled>Português<span>Questões 1 a 26</span></button></div>
+        <div class="callout"><span class="callout-icon">📷</span><div><b id="keySubjectTitle">Leitura do gabarito de Matemática — questões 27 a 52</b>Na foto, deixe visível toda a moldura preta do formulário.</div></div>
+        <div class="actions"><button id="keyCamera" class="btn primary">📹 Abrir câmera e ler</button><label class="btn ghost" for="keyFile">📷 Escolher foto salva</label><input id="keyFile" class="hidden" type="file" accept="image/*"><button class="btn ghost" id="keyManual">⌨ Preencher manualmente</button><button class="btn ghost" id="openHelp">? Como fotografar</button></div>
+        <div id="keyScannerHost"></div>
+      </div>
+      <div class="card" id="keyEditorCard">
+        <div class="card-title"><div><h3 id="keyEditorTitle">Respostas oficiais — Matemática</h3><p id="keyRangeText">Questões 27–39 para baixo na coluna esquerda; 40–52 para baixo na coluna direita.</p></div></div>
+        <div id="keyGrid" class="answer-grid"></div>
+        <div class="key-footer"><span id="keyProgress" class="progress-text">0 de 26 respostas preenchidas</span><div class="actions"><button id="clearKey" class="btn danger">Limpar esta matéria</button><button id="saveKey" class="btn success">✓ Salvar gabarito desta matéria</button></div></div>
+      </div>
+    </section>
+
+    <section id="panel-student" class="panel">
+      <div class="card">
+        <div class="card-title"><div><h2>2. Corrija o cartão do aluno</h2><p>Matemática é obrigatória. Português aparece somente quando estiver habilitado.</p></div><span id="studentKeyStatus" class="status-pill">Matemática pendente</span></div>
+        <div id="activeRoomInfo" class="room-info hidden"><span>SALA ATUAL</span><strong id="activeRoomName"></strong><small id="activeRoomCount"></small></div>
+        <div class="form-grid">
+          <label class="field"><span>Nome do estudante * — será salvo com o resultado</span><input id="studentName" class="input" placeholder="Digite o nome completo" autocomplete="off"></label>
+          <label class="field"><span>Série / Turma *</span><input id="studentClass" class="input" placeholder="Ex.: 9º A" autocomplete="off"></label>
+          <label class="field"><span>Escola</span><input id="studentSchool" class="input" placeholder="Nome da escola" autocomplete="off"></label>
+        </div>
+        <div class="subject-tabs" id="studentSubjectTabs" style="margin-top:16px"><button class="subject-tab active" data-studentsubject="math">Matemática<span>Questões 27 a 52 • não lido</span></button><button class="subject-tab" data-studentsubject="portuguese" disabled>Português<span>Questões 1 a 26 • desativado</span></button></div>
+        <div class="actions"><button id="studentCamera" class="btn primary">📹 Abrir câmera e corrigir esta matéria</button><label class="btn ghost" for="studentFile">📷 Escolher foto desta matéria</label><input id="studentFile" class="hidden" type="file" accept="image/*"><button id="clearStudent" class="btn ghost">Limpar aluno atual</button><button class="btn ghost helpAgain">? Ajuda</button></div>
+        <div id="studentScannerHost"></div>
+      </div>
+      <div class="card" id="studentEditorCard">
+        <div class="card-title"><div><h3 id="studentEditorTitle">Conferência — Matemática</h3><p id="studentRangeText">Questões 27–39 à esquerda e 40–52 à direita. Clique numa letra para corrigir.</p></div></div>
+        <div class="subject-summary"><div class="subject-score"><span>Matemática</span><strong id="scoreMath">0/26 • nota 0,00</strong></div><div class="subject-score"><span>Português</span><strong id="scorePortuguese">desativado</strong></div><div class="subject-score"><span>Total da prova</span><strong id="scoreTotal">0/26 • nota 0,00</strong></div></div>
+        <div class="score-strip">
+          <div class="metric ok"><span>Acertos</span><strong id="scoreCorrect">0</strong></div>
+          <div class="metric bad"><span>Erros</span><strong id="scoreWrong">0</strong></div>
+          <div class="metric"><span>Em branco / dupla</span><strong id="scoreBlank">26</strong></div>
+          <div class="metric"><span>Porcentagem</span><strong id="scorePercent">0%</strong></div>
+          <div class="metric main"><span>Nota (0–10)</span><strong id="scoreGrade">0,00</strong></div>
+        </div>
+        <div class="legend"><span><i class="dot blue"></i>resposta lida</span><span><i class="dot green"></i>correta</span><span><i class="dot red"></i>incorreta</span><span><i class="dot orange"></i>em branco/dupla</span></div>
+        <div id="studentGrid" class="answer-grid"></div>
+        <div class="key-footer"><span id="studentProgress" class="progress-text">Aguardando leitura do cartão</span><button id="saveStudent" class="btn success">✓ Salvar e corrigir próximo aluno</button></div>
+      </div>
+    </section>
+
+    <section id="panel-results" class="panel">
+      <div class="card">
+        <div class="card-title"><div><h2>3. Resultados da sala atual</h2><p>Quando terminar, salve e encerre a sala para começar a próxima.</p></div><div class="actions"><button id="exportExcel" class="btn primary small">⬇ Excel horizontal</button><button id="backupJson" class="btn ghost small">⬇ Backup</button><label class="btn ghost small" for="importJson">⬆ Restaurar</label><input id="importJson" class="hidden" type="file" accept="application/json"></div></div>
+        <div class="results-summary"><div class="summary-box"><span>Alunos corrigidos</span><strong id="sumCount">0</strong></div><div class="summary-box"><span>Média da turma</span><strong id="sumAverage">0,00</strong></div><div class="summary-box"><span>Maior nota</span><strong id="sumHigh">0,00</strong></div><div class="summary-box"><span>Aproveitamento</span><strong id="sumPercent">0%</strong></div></div>
+        <div class="actions" style="margin-bottom:12px"><input id="resultSearch" class="input" style="max-width:360px" placeholder="Buscar aluno"><button id="printClass" class="btn dark">🖨 Relatório da sala / PDF</button><button id="finishClass" class="btn success">✓ Encerrar e salvar sala</button><button id="deleteAll" class="btn danger">Excluir sala atual</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Aluno</th><th>Turma</th><th>Matemática</th><th>Português</th><th>Total</th><th>Nota</th><th>Percentual</th><th>Data</th><th>Ações</th></tr></thead><tbody id="resultsBody"></tbody></table></div>
+        <div id="emptyResults" class="empty-scan"><div class="big">📋</div><b>Nenhum resultado salvo</b><div>As correções aparecerão aqui.</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><div><h3>Análise por questão</h3><p>Mostra quais questões tiveram mais erros entre os alunos salvos.</p></div></div>
+        <div id="questionChart" class="chart-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><div><h3>Salas encerradas e salvas</h3><p>Você pode reabrir uma sala, incluir novos alunos e encerrá-la novamente.</p></div><span id="roomCount" class="status-pill">0 salas</span></div>
+        <div id="roomArchive" class="room-list"></div>
+        <div id="emptyRooms" class="empty-scan"><div class="big">🏫</div><b>Nenhuma sala encerrada</b><div>Use “Encerrar e salvar sala” ao terminar uma turma.</div></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="cameraModal" class="modal camera-modal" role="dialog" aria-modal="true" aria-labelledby="cameraTitle">
+    <div class="modal-box camera-box">
+      <div class="modal-head"><h3 id="cameraTitle">Câmera — leitura direta</h3><button id="closeCamera" class="close" aria-label="Fechar câmera">×</button></div>
+      <div class="camera-view"><video id="cameraVideo" autoplay playsinline muted></video><div class="camera-guide"></div><div class="camera-tip">Centralize toda a moldura preta dentro do quadro verde</div></div>
+      <div class="camera-actions"><button id="cancelCamera" class="btn ghost">Cancelar</button><button id="captureCamera" class="btn success">📸 Fotografar e ler automaticamente</button></div>
+    </div>
+  </div>
+
+  <div id="helpModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="modal-box"><div class="modal-head"><h3 id="helpTitle">Como obter uma leitura precisa</h3><button class="close" data-close="helpModal">×</button></div><div class="modal-body">
+      <div class="callout warn"><span class="callout-icon">⚠️</span><div><b>A moldura preta é a referência</b>O sistema encontra a moldura e lê automaticamente. Deixe a borda inteira visível na fotografia.</div></div>
+      <ol class="help-list"><li>Toque em “Abrir câmera”, permita o uso da câmera e centralize toda a moldura preta dentro do guia.</li><li>Coloque a folha sobre uma superfície plana e de cor diferente do papel.</li><li>Use boa iluminação, sem sombra sobre as bolhas e sem reflexo.</li><li>Fotografe de cima, mostrando a moldura inteira e sem cortar as laterais.</li><li>Não use foto borrada. Caneta preta ou azul escura funciona melhor.</li><li>Após a leitura, sempre confira as letras destacadas antes de salvar.</li></ol>
+      <p><b>Importante:</b> antes de fotografar, selecione Português (1–26) ou Matemática (27–52). O leitor usa a mesma posição das 26 bolhas e quatro alternativas (A–D).</p>
+    </div></div>
+  </div>
+
+  <div id="detailModal" class="modal" role="dialog" aria-modal="true"><div class="modal-box"><div class="modal-head"><h3 id="detailTitle">Resultado</h3><button class="close" data-close="detailModal">×</button></div><div id="detailBody" class="modal-body"></div></div></div>
+  <div id="toast" class="toast" role="status"></div>
+  <div id="printReport"></div>
+  <footer>Corretor local • nenhuma foto é enviada para a internet • Matemática 27–52 • Português opcional 1–26</footer>
+
+  <script>
+  (()=>{
+    'use strict';
+    const COUNT=26, TOTAL=52, OPTIONS=['A','B','C','D'];
+    const SUBJECTS={math:{label:'Matemática',start:27,left:'27–39',right:'40–52'},portuguese:{label:'Português',start:1,left:'1–13',right:'14–26'}};
+    const STORE={keys:'corretor_gabaritos_1_52_v3',saved:'corretor_gabaritos_salvos_v3',portugueseEnabled:'corretor_portugues_habilitado_v4',legacyKey:'corretor_livro2_gabarito_v1',records:'corretor_livro2_resultados_v1',school:'corretor_livro2_escola_v1',rooms:'corretor_livro2_salas_v2',active:'corretor_livro2_sala_ativa_v2'};
+    const CENTERS={
+      leftX:[.158,.225,.293,.361], rightX:[.633,.702,.770,.839],
+      rows:[.353,.402,.452,.501,.551,.600,.650,.699,.748,.797,.846,.896,.946]
+    };
+    const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+    const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const br=n=>Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    const validAnswers=a=>Array.isArray(a)&&a.length===COUNT?a.map(v=>OPTIONS.includes(v)?v:''):Array(COUNT).fill('');
+    const blankSet=()=>({portuguese:Array(COUNT).fill(''),math:Array(COUNT).fill('')});
+    const normalizeSet=value=>Array.isArray(value)?{portuguese:Array(COUNT).fill(''),math:validAnswers(value)}:{portuguese:validAnswers(value?.portuguese),math:validAnswers(value?.math)};
+    const copySet=value=>({portuguese:[...value.portuguese],math:[...value.math]});
+    const subjectComplete=subject=>official[subject].every(v=>OPTIONS.includes(v));
+    const activeSubjects=()=>portugueseEnabled?['math','portuguese']:['math'];
+    const officialReady=()=>activeSubjects().every(s=>savedKeys[s]&&subjectComplete(s));
+    let official=normalizeSet(loadJSON(STORE.keys,loadJSON(STORE.legacyKey,null)));
+    let savedKeys=loadJSON(STORE.saved,null)||{portuguese:false,math:localStorage.getItem(STORE.legacyKey)!==null&&official.math.every(Boolean)};
+    savedKeys={portuguese:!!savedKeys.portuguese&&official.portuguese.every(Boolean),math:!!savedKeys.math&&official.math.every(Boolean)};
+    let portugueseEnabled=loadJSON(STORE.portugueseEnabled,false)===true;
+    let records=loadJSON(STORE.records,[]),rooms=loadJSON(STORE.rooms,[]),activeRoom=loadJSON(STORE.active,null);
+    let keySubject='math',studentSubject='math',studentAnswers=blankSet(),studentTouched={portuguese:false,math:false},toastTimer;
+    if(!Array.isArray(records))records=[];records=records.map(normalizeRecord);
+    if(!Array.isArray(rooms))rooms=[];rooms=rooms.map(room=>({...room,official:normalizeSet(room.official),records:Array.isArray(room.records)?room.records.map(normalizeRecord):[]}));
+    if(!activeRoom&&records.length){const first=records[records.length-1];activeRoom={id:first.roomId||uid(),className:first.className||'',school:first.school||'',startedAt:first.createdAt||new Date().toISOString()}}
+    if(localStorage.getItem(STORE.portugueseEnabled)===null&&activeRoom&&records.some(r=>r.scope!=='math-only'))portugueseEnabled=true;
+    $('#studentSchool').value=localStorage.getItem(STORE.school)||'';
+    $('#enablePortuguese').checked=portugueseEnabled;
+    if(activeRoom){$('#studentClass').value=activeRoom.className||'';$('#studentSchool').value=activeRoom.school||$('#studentSchool').value}
+
+    function loadJSON(k,fallback){try{const x=JSON.parse(localStorage.getItem(k));return x??fallback}catch{return fallback}}
+    function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random()}
+    function scoreSubject(ans,key){let correct=0,wrong=0,blank=0;ans.forEach((a,i)=>{if(!OPTIONS.includes(a))blank++;else if(a===key[i])correct++;else wrong++});return{correct,wrong,blank,percent:correct/COUNT*100,grade:correct/COUNT*10}}
+    function scoreAll(answers,key=official,withPortuguese=portugueseEnabled){const portuguese=scoreSubject(answers.portuguese,key.portuguese),math=scoreSubject(answers.math,key.math),correct=math.correct+(withPortuguese?portuguese.correct:0),wrong=math.wrong+(withPortuguese?portuguese.wrong:0),blank=math.blank+(withPortuguese?portuguese.blank:0),denominator=withPortuguese?TOTAL:COUNT;return{subjects:{math,portuguese},correct,wrong,blank,denominator,percent:correct/denominator*100,grade:correct/denominator*10}}
+    function normalizeRecord(r){
+      const legacy=Array.isArray(r?.answers),answers=normalizeSet(r?.answers),key=normalizeSet(r?.official||official),computed=scoreAll(answers,key,r?.scope!=='math-only');
+      if(legacy){const math={correct:Number(r.correct||0),wrong:Number(r.wrong||0),blank:Number(r.blank??COUNT),percent:Number(r.percent||0),grade:Number(r.grade||0)};return{...r,scope:'math-only',answers,official:key,subjectScores:{portuguese:scoreSubject(answers.portuguese,key.portuguese),math}}}
+      return{...r,scope:r?.scope||'both',answers,official:key,subjectScores:r?.subjectScores||computed.subjects,correct:Number(r?.correct??computed.correct),wrong:Number(r?.wrong??computed.wrong),blank:Number(r?.blank??computed.blank),percent:Number(r?.percent??computed.percent),grade:Number(r?.grade??computed.grade)};
+    }
+    function persist(){try{localStorage.setItem(STORE.keys,JSON.stringify(official));localStorage.setItem(STORE.saved,JSON.stringify(savedKeys));localStorage.setItem(STORE.portugueseEnabled,JSON.stringify(portugueseEnabled));localStorage.setItem(STORE.legacyKey,JSON.stringify(official.math));localStorage.setItem(STORE.records,JSON.stringify(records));localStorage.setItem(STORE.rooms,JSON.stringify(rooms));localStorage.setItem(STORE.school,$('#studentSchool').value.trim());activeRoom?localStorage.setItem(STORE.active,JSON.stringify(activeRoom)):localStorage.removeItem(STORE.active);return true}catch(err){console.error(err);toast('Não foi possível salvar no navegador. Verifique se o armazenamento do navegador está permitido.','bad');return false}}
+    function toast(msg,type=''){const el=$('#toast');el.textContent=msg;el.className='toast show '+type;clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.className='toast',3300)}
+    function setTab(name){
+      if(name==='key'&&records.length){toast('Encerre e salve a sala atual antes de trocar o gabarito oficial.','bad');return}
+      $$('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+      $$('.panel').forEach(p=>p.classList.toggle('active',p.id==='panel-'+name));
+      if(name==='results') renderResults();
+      if(name==='student'&&!officialReady()) toast(portugueseEnabled?'Salve os gabaritos de Matemática e Português antes de corrigir.':'Salve o gabarito de Matemática antes de corrigir.','bad');
+      scrollTo({top:0,behavior:'smooth'});
+    }
+    $$('.nav button').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+
+    function updateRoomState(){
+      const active=!!activeRoom;
+      $('#activeRoomInfo').classList.toggle('hidden',!active);
+      $('#activeRoomName').textContent=active?activeRoom.className:'';
+      $('#activeRoomCount').textContent=active?`${records.length} aluno(s) salvo(s). A série fica fixa até encerrar a sala.`:'';
+      $('#studentClass').disabled=!!active;
+      const keyTab=$('.nav button[data-tab="key"]');keyTab.disabled=!!active;
+      $('#enablePortuguese').disabled=!!active;
+      $('#finishClass').disabled=!records.length;
+    }
+
+    function answerGrid(host,answers,mode,onChange,subject){
+      const info=SUBJECTS[subject];host.innerHTML=`<div class="answer-column" aria-label="Questões ${info.left}"></div><div class="answer-column" aria-label="Questões ${info.right}"></div>`;
+      const columns=[...host.querySelectorAll('.answer-column')];
+      answers.forEach((ans,i)=>{
+        const q=info.start+i, row=document.createElement('div'); row.className='qrow'; row.dataset.i=i;
+        const meta=mode==='student'?questionMeta(ans,official[subject][i]):'';
+        row.innerHTML=`<div class="qno">${q}</div><div class="choices">${OPTIONS.map(o=>`<button class="choice ${ans===o?'selected':''}" data-a="${o}" title="Questão ${q}, alternativa ${o}">${o}</button>`).join('')}<button class="choice clear ${ans==='X'?'invalid':''}" data-a="" title="Limpar">${ans==='X'?'dupla':'—'}</button></div><div class="qmeta ${meta.cls}">${meta.text||''}</div>`;
+        row.querySelectorAll('.choice').forEach(btn=>btn.onclick=()=>{answers[i]=btn.dataset.a;onChange(i);});
+        columns[i<13?0:1].appendChild(row);
+      });
+    }
+    function questionMeta(ans,key){
+      if(ans==='X') return {text:'marcação dupla',cls:'warn'};
+      if(!ans) return {text:'em branco',cls:'warn'};
+      if(!key) return {text:'sem oficial',cls:'warn'};
+      return ans===key?{text:`✓ correta (${key})`,cls:'ok'}:{text:`✕ oficial: ${key}`,cls:'bad'};
+    }
+    function renderKey(){
+      const info=SUBJECTS[keySubject],answers=official[keySubject];
+      $('#keySubjectTitle').textContent=`Leitura do gabarito de ${info.label} — questões ${info.start} a ${info.start+25}`;$('#keyEditorTitle').textContent=`Respostas oficiais — ${info.label}`;$('#keyRangeText').textContent=`Questões ${info.left} para baixo na coluna esquerda; ${info.right} para baixo na coluna direita.`;
+      answerGrid($('#keyGrid'),answers,'key',()=>{savedKeys[keySubject]=false;renderKey();updateStudent() },keySubject);
+      if(typeof keyScanner!=='undefined'&&keyScanner.warped&&keyScanner.context===keySubject)keyScanner.drawResult(answers);
+      const n=answers.filter(v=>OPTIONS.includes(v)).length;
+      $('#keyProgress').textContent=`${n} de ${COUNT} respostas preenchidas`;
+      updateKeyStatus();
+    }
+    function updateKeyStatus(){
+      const required=activeSubjects(),savedCount=required.filter(s=>savedKeys[s]).length,ready=officialReady();
+      $('#keyStatus').textContent=ready?(portugueseEnabled?'2 de 2 salvos':'Matemática salva'):(portugueseEnabled?`${savedCount} de 2 salvos`:'Matemática pendente');$('#keyStatus').classList.toggle('ok',ready);
+      $('#studentKeyStatus').textContent=ready?(portugueseEnabled?'Matemática e Português prontos':'Matemática pronta • Português desativado'):(portugueseEnabled?'Gabaritos oficiais pendentes':'Gabarito de Matemática pendente');$('#studentKeyStatus').classList.toggle('ok',ready);
+      $('#enablePortuguese').checked=portugueseEnabled;$('#portugueseModeText').textContent=portugueseEnabled?'Ativado: o aluno precisará dos cartões de Matemática e Português.':'Desativado: o sistema corrige e salva somente Matemática.';
+      $$('[data-keysubject]').forEach(b=>{const s=b.dataset.keysubject;b.disabled=s==='portuguese'&&!portugueseEnabled;b.classList.toggle('active',s===keySubject);b.classList.toggle('done',savedKeys[s]&&(s==='math'||portugueseEnabled))});
+    }
+    $('#saveKey').onclick=()=>{
+      const info=SUBJECTS[keySubject],missing=official[keySubject].map((v,i)=>v?'':info.start+i).filter(Boolean);
+      if(missing.length){toast(`Faltam ${missing.length} respostas: ${missing.join(', ')}.`,'bad');return}
+      const previousSaved=savedKeys[keySubject];savedKeys[keySubject]=true;if(!persist()){savedKeys[keySubject]=previousSaved;updateKeyStatus();return}updateKeyStatus();toast(`Gabarito de ${info.label} salvo com 26 respostas.`,'ok');
+      const next=activeSubjects().find(s=>!savedKeys[s]);if(next)setTimeout(()=>selectKeySubject(next),350);else setTimeout(()=>setTab('student'),500);
+    };
+    $('#clearKey').onclick=()=>{const info=SUBJECTS[keySubject];if(confirm(`Limpar o gabarito de ${info.label}?`)){official[keySubject]=Array(COUNT).fill('');savedKeys[keySubject]=false;persist();keyScanner.reset();renderKey();updateStudent();toast(`Gabarito de ${info.label} limpo.`)}};
+    $('#keyManual').onclick=()=>$('#keyEditorCard').scrollIntoView({behavior:'smooth'});
+    function selectKeySubject(subject){if(subject==='portuguese'&&!portugueseEnabled){toast('Habilite Português antes de selecionar essa opção.','bad');return}keySubject=subject;keyScanner.reset();renderKey()}
+    $$('[data-keysubject]').forEach(b=>b.onclick=()=>selectKeySubject(b.dataset.keysubject));
+    $('#enablePortuguese').onchange=e=>{
+      if(activeRoom||records.length){e.target.checked=portugueseEnabled;toast('Encerre a sala atual antes de alterar o modo de Português.','bad');return}
+      portugueseEnabled=e.target.checked;keySubject=portugueseEnabled?'portuguese':'math';studentSubject='math';persist();keyScanner.reset();studentScanner.reset();renderKey();updateStudent();toast(portugueseEnabled?'Português habilitado. Cadastre agora o gabarito das questões 1 a 26.':'Português desativado. O sistema salvará somente Matemática.','ok');
+    };
+
+    function updateStudent(){
+      const info=SUBJECTS[studentSubject],answers=studentAnswers[studentSubject],s=scoreAll(studentAnswers);
+      $('#studentEditorTitle').textContent=`Conferência — ${info.label}`;$('#studentRangeText').textContent=`Questões ${info.left} à esquerda e ${info.right} à direita. Clique numa letra para corrigir.`;
+      answerGrid($('#studentGrid'),answers,'student',()=>{studentTouched[studentSubject]=true;updateStudent()},studentSubject);
+      if(typeof studentScanner!=='undefined'&&studentScanner.warped&&studentScanner.context===studentSubject)studentScanner.drawResult(answers,official[studentSubject]);
+      $('#scoreCorrect').textContent=s.correct;$('#scoreWrong').textContent=s.wrong;
+      $('#scoreBlank').textContent=s.blank;$('#scorePercent').textContent=br(s.percent).replace(',00','')+'%';$('#scoreGrade').textContent=br(s.grade);
+      $('#scorePortuguese').textContent=portugueseEnabled?`${s.subjects.portuguese.correct}/26 • nota ${br(s.subjects.portuguese.grade)}`:'desativado';$('#scoreMath').textContent=`${s.subjects.math.correct}/26 • nota ${br(s.subjects.math.grade)}`;$('#scoreTotal').textContent=`${s.correct}/${s.denominator} • nota ${br(s.grade)}`;
+      const filled=COUNT-s.subjects[studentSubject].blank;$('#studentProgress').textContent=studentTouched[studentSubject]?`${info.label}: ${filled} questões com marca detectada`:`${info.label}: aguardando leitura do cartão`;
+      $$('[data-studentsubject]').forEach(b=>{const sub=b.dataset.studentsubject,enabled=sub==='math'||portugueseEnabled,done=enabled&&studentTouched[sub];b.disabled=!enabled;b.classList.toggle('active',sub===studentSubject);b.classList.toggle('done',done);b.querySelector('span').textContent=`Questões ${SUBJECTS[sub].start} a ${SUBJECTS[sub].start+25} • ${enabled?(done?'lido':'não lido'):'desativado'}`});
+      $('#saveStudent').disabled=!officialReady();
+    }
+    function selectStudentSubject(subject){if(subject==='portuguese'&&!portugueseEnabled){toast('Português está desativado.','bad');return}studentSubject=subject;studentScanner.reset();updateStudent()}
+    $$('[data-studentsubject]').forEach(b=>b.onclick=()=>selectStudentSubject(b.dataset.studentsubject));
+    function newStudent(clearRoom=false){
+      studentAnswers=blankSet();studentTouched={portuguese:false,math:false};studentSubject='math';studentScanner.reset();
+      $('#studentName').value='';if(clearRoom)$('#studentClass').value='';
+      updateStudent();setTimeout(()=>$('#studentName').focus(),50);
+    }
+    $('#clearStudent').onclick=()=>newStudent(false);
+    $('#saveStudent').onclick=()=>{
+      if(!officialReady()){toast(portugueseEnabled?'Primeiro salve os gabaritos oficiais de Matemática e Português.':'Primeiro salve o gabarito oficial de Matemática.','bad');return}
+      const name=$('#studentName').value.trim();if(!name){toast('Digite o nome do estudante.','bad');$('#studentName').focus();return}
+      const className=$('#studentClass').value.trim();if(!className){toast('Digite a série ou turma do estudante.','bad');$('#studentClass').focus();return}
+      const missingSubjects=activeSubjects().filter(sub=>!studentTouched[sub]);if(missingSubjects.length){selectStudentSubject(missingSubjects[0]);toast(`Leia ou preencha o cartão de ${SUBJECTS[missingSubjects[0]].label}.`,'bad');return}
+      const s=scoreAll(studentAnswers), school=$('#studentSchool').value.trim();
+      const previousActive=activeRoom;if(!activeRoom)activeRoom={id:uid(),className,school,startedAt:new Date().toISOString()};
+      records.unshift({id:uid(),roomId:activeRoom.id,name,className:activeRoom.className,school,scope:portugueseEnabled?'both':'math-only',answers:copySet(studentAnswers),official:copySet(official),subjectScores:s.subjects,correct:s.correct,wrong:s.wrong,blank:s.blank,percent:s.percent,grade:s.grade,createdAt:new Date().toISOString()});
+      if(!persist()){records.shift();activeRoom=previousActive;updateRoomState();return}toast(`Resultado de ${name} salvo: ${s.correct}/${s.denominator} - nota ${br(s.grade)}.`,'ok');
+      updateRoomState();newStudent(false);setTab('student');
+    };
+
+    class SheetScanner{
+      constructor(host,fileInput,onRead){
+        this.host=host;this.fileInput=fileInput;this.onRead=onRead;this.src=document.createElement('canvas');this.img=null;this.corners=[];this.drag=-1;this.scores=[];this.threshold=.40;this.mode='empty';
+        host.innerHTML=`<div class="scanner hidden"><div class="scanner-head"><div><strong>Leitura automática do cartão</strong><small class="scanSubtitle">Moldura, inclinação e intensidade serão reguladas automaticamente</small></div><span class="status-pill scanStatus">Aguardando foto</span></div><div class="hintbar">Aguarde a leitura automática. A foto corrigida aparecerá com o resultado sobre o próprio gabarito.</div><div class="scanner-stage"><div class="empty-scan"><div class="big">📄</div><b>Insira uma foto do cartão</b></div><canvas class="preview hidden"></canvas><canvas class="result hidden"></canvas></div><div class="scanner-controls"><button class="btn ghost small auto">◎ Ler novamente</button><button class="btn ghost small rotate">↻ Girar e reler</button><button class="btn primary small downloadScan hidden">⬇ Baixar gabarito corrigido</button><label class="threshold hidden">Sensibilidade <input type="range" min="28" max="68" value="40"><output>40%</output></label></div></div>`;
+        this.box=host.querySelector('.scanner');this.preview=host.querySelector('.preview');this.result=host.querySelector('.result');this.empty=host.querySelector('.empty-scan');this.status=host.querySelector('.scanStatus');this.subtitle=host.querySelector('.scanSubtitle');this.range=host.querySelector('.threshold input');this.thresholdBox=host.querySelector('.threshold');
+        fileInput.addEventListener('change',e=>{const f=e.target.files[0];if(f)this.load(f);e.target.value=''});
+        host.querySelector('.auto').onclick=()=>{this.autoCorners();this.process()};
+        host.querySelector('.rotate').onclick=()=>this.rotate();
+        host.querySelector('.downloadScan').onclick=()=>this.downloadCorrected();
+        this.range.oninput=()=>{this.threshold=Number(this.range.value)/100;this.thresholdBox.querySelector('output').textContent=this.range.value+'%';if(this.scores.length)this.applyScores()};
+        this.preview.addEventListener('pointerdown',e=>this.pointerDown(e));
+        this.preview.addEventListener('pointermove',e=>this.pointerMove(e));
+        addEventListener('pointerup',()=>{this.drag=-1});
+      }
+      async load(file){
+        try{
+          const bmp=await createImageBitmap(file,{imageOrientation:'from-image'}),max=1800,scale=Math.min(1,max/Math.max(bmp.width,bmp.height));
+          this.src.width=Math.round(bmp.width*scale);this.src.height=Math.round(bmp.height*scale);this.src.getContext('2d',{willReadFrequently:true}).drawImage(bmp,0,0,this.src.width,this.src.height);bmp.close();
+          this.img=true;this.box.classList.remove('hidden');this.empty.classList.add('hidden');this.preview.classList.remove('hidden');this.result.classList.add('hidden');this.thresholdBox.classList.add('hidden');this.mode='corners';this.status.textContent='Localizando moldura...';this.autoCorners();this.drawPreview();this.box.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>this.process(),120);
+        }catch(err){console.error(err);toast('Não foi possível abrir essa imagem. Tente JPG ou PNG.','bad')}
+      }
+      reset(){this.img=null;this.corners=[];this.scores=[];this.box.classList.add('hidden');this.preview.classList.add('hidden');this.result.classList.add('hidden');this.host.querySelector('.downloadScan').classList.add('hidden')}
+      autoCorners(){
+        if(!this.img)return;const w=this.src.width,h=this.src.height,ctx=this.src.getContext('2d',{willReadFrequently:true});
+        const sw=Math.min(640,w),sh=Math.round(h*sw/w),tmp=document.createElement('canvas');tmp.width=sw;tmp.height=sh;const t=tmp.getContext('2d',{willReadFrequently:true});t.drawImage(this.src,0,0,sw,sh);const d=t.getImageData(0,0,sw,sh).data,points=[];
+        for(let y=1;y<sh-1;y+=2)for(let x=1;x<sw-1;x+=2){const p=(y*sw+x)*4,lum=d[p]*.299+d[p+1]*.587+d[p+2]*.114;if(lum<92)points.push([x,y])}
+        const fit=(axis,minFrac,maxFrac)=>{
+          let best={m:0,b:(minFrac+maxFrac)/2*(axis==='h'?sh:sw),score:-1};const size=axis==='h'?sh:sw,other=axis==='h'?sw:sh;
+          for(let si=-24;si<=24;si++){const m=si/100,acc=new Uint16Array(Math.ceil(size+other*.28)+8),offset=Math.ceil(other*.14)+3;
+            for(const [x,y] of points){const raw=axis==='h'?y-m*x:x-m*y,bi=Math.round(raw)+offset;if(bi>=2&&bi<acc.length-2)acc[bi]++}
+            const lo=Math.max(2,Math.floor(size*minFrac)+offset),hi=Math.min(acc.length-3,Math.ceil(size*maxFrac)+offset);
+            for(let i=lo;i<=hi;i++){const score=acc[i-2]+acc[i-1]*2+acc[i]*3+acc[i+1]*2+acc[i+2];if(score>best.score)best={m,b:i-offset,score}}
+          }return best;
+        };
+        const top=fit('h',-.08,.42),bottom=fit('h',.58,1.08),left=fit('v',-.08,.42),right=fit('v',.58,1.08);
+        const cross=(hl,vl)=>{const den=1-vl.m*hl.m,x=(vl.m*hl.b+vl.b)/den,y=hl.m*x+hl.b;return [x,y]};
+        let q=[cross(top,left),cross(top,right),cross(bottom,right),cross(bottom,left)];
+        const area=Math.abs(q.reduce((s,p,i)=>s+p[0]*q[(i+1)%4][1]-q[(i+1)%4][0]*p[1],0))/2;
+        if(!q.every(p=>Number.isFinite(p[0])&&Number.isFinite(p[1]))||area<sw*sh*.34){q=[[sw*.08,sh*.06],[sw*.92,sh*.06],[sw*.92,sh*.94],[sw*.08,sh*.94]]}
+        const sx=w/sw,sy=h/sh;this.corners=q.map(([x,y])=>[Math.max(0,Math.min(w-1,x*sx)),Math.max(0,Math.min(h-1,y*sy))]);
+        this.status.textContent='Moldura e inclinação ajustadas';this.status.className='status-pill scanStatus ok';
+      }
+      pos(e){const r=this.preview.getBoundingClientRect();return [(e.clientX-r.left)*this.preview.width/r.width,(e.clientY-r.top)*this.preview.height/r.height]}
+      pointerDown(e){if(!this.img||this.mode!=='corners')return;e.preventDefault();const p=this.pos(e);if(this.corners.length<4){this.corners.push(p);this.status.textContent=this.corners.length<4?`Clique no canto ${this.corners.length+1}`:'Confira os 4 pontos'}else{let best=0,bd=Infinity;this.corners.forEach((c,i)=>{const d=(c[0]-p[0])**2+(c[1]-p[1])**2;if(d<bd){bd=d;best=i}});this.drag=best;this.corners[best]=p}this.drawPreview()}
+      pointerMove(e){if(this.drag<0||this.mode!=='corners')return;e.preventDefault();this.corners[this.drag]=this.pos(e);this.drawPreview()}
+      drawPreview(){
+        if(!this.img)return;this.mode='corners';this.preview.width=this.src.width;this.preview.height=this.src.height;const c=this.preview.getContext('2d');c.drawImage(this.src,0,0);const scale=Math.max(this.src.width,this.src.height)/1100;c.lineWidth=4*scale;c.strokeStyle='#1e88e5';c.fillStyle='#1e88e5';c.font=`bold ${22*scale}px Arial`;c.textBaseline='middle';
+        if(this.corners.length>1){c.beginPath();c.moveTo(...this.corners[0]);this.corners.slice(1).forEach(p=>c.lineTo(...p));if(this.corners.length===4)c.closePath();c.stroke()}
+        this.corners.forEach((p,i)=>{c.beginPath();c.arc(p[0],p[1],13*scale,0,Math.PI*2);c.fill();c.fillStyle='#fff';c.textAlign='center';c.fillText(String(i+1),p[0],p[1]+scale);c.fillStyle='#1e88e5'});
+        this.preview.classList.remove('hidden');this.result.classList.add('hidden');this.thresholdBox.classList.add('hidden');this.subtitle.textContent='Enquadramento encontrado automaticamente';
+      }
+      rotate(){
+        if(!this.img)return;const n=document.createElement('canvas');n.width=this.src.height;n.height=this.src.width;const c=n.getContext('2d');c.translate(n.width,0);c.rotate(Math.PI/2);c.drawImage(this.src,0,0);this.src=n;this.corners=[];this.autoCorners();this.drawPreview();setTimeout(()=>this.process(),80);
+      }
+      showPreview(){this.drawPreview();this.box.scrollIntoView({behavior:'smooth',block:'center'})}
+      process(){
+        if(!this.img)return;if(this.corners.length!==4)this.autoCorners();
+        try{
+          this.status.textContent='Lendo marcações...';const W=900,H=1395;const out=document.createElement('canvas');out.width=W;out.height=H;warpPerspective(this.src,out,this.corners);this.warped=out;this.scores=scanBubbles(out);const suggested=suggestThreshold(this.scores.flat());this.threshold=suggested;this.range.value=Math.round(suggested*100);this.thresholdBox.querySelector('output').textContent=Math.round(suggested*100)+'%';this.applyScores();
+          this.preview.classList.add('hidden');this.result.classList.remove('hidden');this.thresholdBox.classList.add('hidden');this.host.querySelector('.downloadScan').classList.remove('hidden');this.mode='result';this.status.textContent='Leitura concluída';this.status.className='status-pill scanStatus ok';this.subtitle.textContent='Confira as marcações coloridas antes de salvar';
+        }catch(err){console.error(err);toast('Não foi possível analisar a foto automaticamente. Tire outra foto mostrando toda a moldura preta.','bad')}
+      }
+      applyScores(){
+        const answers=this.scores.map(row=>{const ranked=row.map((v,i)=>({v,i})).sort((a,b)=>b.v-a.v),top=ranked[0],second=ranked[1];if(top.v<this.threshold)return '';if(second.v>=this.threshold&&top.v-second.v<.075)return 'X';return OPTIONS[top.i]});
+        this.drawResult(answers);this.onRead(answers,this.scores,this.threshold);
+      }
+      drawResult(answers,key=null){
+        this.result.width=this.warped.width;this.result.height=this.warped.height;const c=this.result.getContext('2d');c.drawImage(this.warped,0,0);const W=this.result.width,H=this.result.height;c.lineWidth=3;
+        for(let i=0;i<COUNT;i++){const side=i<13?'left':'right',row=i%13,xs=side==='left'?CENTERS.leftX:CENTERS.rightX,y=CENTERS.rows[row],isCorrect=key&&answers[i]===key[i],isWrong=key&&OPTIONS.includes(answers[i])&&!isCorrect;for(let a=0;a<4;a++){const selected=answers[i]===OPTIONS[a],multi=answers[i]==='X'&&this.scores[i][a]>=this.threshold;c.beginPath();c.arc(xs[a]*W,y*H,W*.027,0,Math.PI*2);c.strokeStyle=selected?(key?(isCorrect?'#0b9a55':'#e53935'):'#1976d2'):multi?'#f59e0b':'rgba(30,136,229,.30)';c.lineWidth=selected||multi?6:2;c.stroke();if(selected||multi){c.fillStyle=selected?(key?(isCorrect?'rgba(11,154,85,.22)':'rgba(229,57,53,.22)'):'rgba(25,118,210,.20)'):'rgba(245,158,11,.22)';c.fill()}}
+          if(key&&!OPTIONS.includes(answers[i])){c.fillStyle='#f59e0b';c.font=`bold ${W*.018}px Arial`;c.textAlign='center';c.fillText(answers[i]==='X'?'DUPLA':'BRANCO',(side==='left'?.265:.745)*W,y*H+W*.045)}
+        }
+      }
+      downloadCorrected(){
+        if(!this.result.width)return;const a=document.createElement('a');a.href=this.result.toDataURL('image/jpeg',.94);a.download='gabarito_corrigido_'+new Date().toISOString().slice(0,10)+'.jpg';a.click();
+      }
+    }
+
+    function scanBubbles(canvas){
+      const W=canvas.width,H=canvas.height,d=canvas.getContext('2d',{willReadFrequently:true}).getImageData(0,0,W,H).data,r=W*.0187,rr=r*r,ring1=(W*.027)**2,ring2=(W*.036)**2;
+      const all=[];
+      for(let i=0;i<COUNT;i++){
+        const xs=i<13?CENTERS.leftX:CENTERS.rightX,y=CENTERS.rows[i%13],row=[];
+        for(const xf of xs){const cx=xf*W,cy=y*H,background=[];for(let yy=Math.floor(cy-W*.036);yy<=Math.ceil(cy+W*.036);yy+=2)for(let xx=Math.floor(cx-W*.036);xx<=Math.ceil(cx+W*.036);xx+=2){const ds=(xx-cx)**2+(yy-cy)**2;if(ds>=ring1&&ds<=ring2&&xx>=0&&yy>=0&&xx<W&&yy<H){const p=(yy*W+xx)*4;background.push(d[p]*.299+d[p+1]*.587+d[p+2]*.114)}}background.sort((a,b)=>a-b);const bg=background[Math.floor(background.length*.72)]||235,cut=Math.max(65,bg*.69);let dark=0,total=0;for(let yy=Math.floor(cy-r);yy<=Math.ceil(cy+r);yy++)for(let xx=Math.floor(cx-r);xx<=Math.ceil(cx+r);xx++){if((xx-cx)**2+(yy-cy)**2<=rr&&xx>=0&&yy>=0&&xx<W&&yy<H){const p=(yy*W+xx)*4,lum=d[p]*.299+d[p+1]*.587+d[p+2]*.114;if(lum<cut)dark++;total++}}row.push(total?dark/total:0)}all.push(row);
+      }
+      return all;
+    }
+    function suggestThreshold(vals){
+      let lo=.20,hi=.72;for(let z=0;z<14;z++){let a=[],b=[];vals.forEach(v=>(Math.abs(v-lo)<Math.abs(v-hi)?a:b).push(v));if(a.length)lo=a.reduce((x,y)=>x+y,0)/a.length;if(b.length)hi=b.reduce((x,y)=>x+y,0)/b.length}
+      if(hi-lo<.13||hi<.39)return .40;return Math.max(.34,Math.min(.58,(lo+hi)/2));
+    }
+    function warpPerspective(src,dst,quad){
+      const W=dst.width,H=dst.height,from=[[0,0],[W-1,0],[W-1,H-1],[0,H-1]],h=homography(from,quad),sctx=src.getContext('2d',{willReadFrequently:true}),sd=sctx.getImageData(0,0,src.width,src.height),out=dst.getContext('2d').createImageData(W,H),a=sd.data,b=out.data;
+      for(let y=0,p=0;y<H;y++)for(let x=0;x<W;x++,p+=4){const den=h[6]*x+h[7]*y+1,sx=(h[0]*x+h[1]*y+h[2])/den,sy=(h[3]*x+h[4]*y+h[5])/den;if(sx>=0&&sy>=0&&sx<src.width-1&&sy<src.height-1){const x0=sx|0,y0=sy|0,fx=sx-x0,fy=sy-y0,i=(y0*src.width+x0)*4,j=i+4,k=i+src.width*4,l=k+4;for(let c=0;c<3;c++)b[p+c]=a[i+c]*(1-fx)*(1-fy)+a[j+c]*fx*(1-fy)+a[k+c]*(1-fx)*fy+a[l+c]*fx*fy;b[p+3]=255}else{b[p]=b[p+1]=b[p+2]=255;b[p+3]=255}}
+      dst.getContext('2d').putImageData(out,0,0);
+    }
+    function homography(from,to){
+      const A=[],B=[];for(let i=0;i<4;i++){const [x,y]=from[i],[u,v]=to[i];A.push([x,y,1,0,0,0,-u*x,-u*y]);B.push(u);A.push([0,0,0,x,y,1,-v*x,-v*y]);B.push(v)}return solve(A,B);
+    }
+    function solve(A,b){
+      const n=b.length,M=A.map((r,i)=>[...r,b[i]]);for(let i=0;i<n;i++){let m=i;for(let r=i+1;r<n;r++)if(Math.abs(M[r][i])>Math.abs(M[m][i]))m=r;[M[i],M[m]]=[M[m],M[i]];const q=M[i][i];if(Math.abs(q)<1e-10)throw Error('Pontos inválidos');for(let c=i;c<=n;c++)M[i][c]/=q;for(let r=0;r<n;r++)if(r!==i){const f=M[r][i];for(let c=i;c<=n;c++)M[r][c]-=f*M[i][c]}}return M.map(r=>r[n]);
+    }
+
+    const keyScanner=new SheetScanner($('#keyScannerHost'),$('#keyFile'),answers=>{const subject=keyScanner.context||keySubject;keySubject=subject;official[subject]=validAnswers(answers);savedKeys[subject]=false;renderKey();$('#keyEditorCard').scrollIntoView({behavior:'smooth',block:'start'});toast(`Leitura de ${SUBJECTS[subject].label} concluída. Confira as 26 respostas antes de salvar.`,'ok')});
+    const studentScanner=new SheetScanner($('#studentScannerHost'),$('#studentFile'),answers=>{const subject=studentScanner.context||studentSubject;studentSubject=subject;studentAnswers[subject]=answers.map(v=>v==='X'?'X':OPTIONS.includes(v)?v:'');studentTouched[subject]=true;updateStudent();$('#studentEditorCard').scrollIntoView({behavior:'smooth',block:'start'});toast(`Cartão de ${SUBJECTS[subject].label} lido. Agora confira as marcações.`,'ok')});
+    $('#keyFile').addEventListener('click',()=>keyScanner.context=keySubject);$('#studentFile').addEventListener('click',()=>studentScanner.context=studentSubject);
+
+    let cameraStream=null,cameraTarget='student',cameraSubject='math';
+    async function openDirectCamera(target){
+      if(target==='student'){
+        if(!officialReady()){toast(portugueseEnabled?'Primeiro salve os gabaritos oficiais de Matemática e Português.':'Primeiro salve o gabarito oficial de Matemática.','bad');return}
+        if(!$('#studentName').value.trim()){toast('Digite o nome do estudante antes de abrir a câmera.','bad');$('#studentName').focus();return}
+        if(!$('#studentClass').value.trim()){toast('Digite a série ou turma antes de abrir a câmera.','bad');$('#studentClass').focus();return}
+      }
+      if(!navigator.mediaDevices?.getUserMedia){toast('A câmera ao vivo não está disponível neste navegador. Use “Escolher foto salva”.','bad');return}
+      stopCamera();cameraTarget=target;cameraSubject=target==='key'?keySubject:studentSubject;$('#cameraTitle').textContent=`Câmera — ${target==='key'?'gabarito oficial':'cartão do aluno'} — ${SUBJECTS[cameraSubject].label}`;
+      try{
+        cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
+        const video=$('#cameraVideo');video.srcObject=cameraStream;$('#cameraModal').classList.add('open');await video.play();
+      }catch(err){console.error(err);stopCamera();toast('Não foi possível abrir a câmera. Autorize o acesso no navegador e tente novamente.','bad')}
+    }
+    function stopCamera(){
+      if(cameraStream)cameraStream.getTracks().forEach(track=>track.stop());cameraStream=null;const video=$('#cameraVideo');if(video)video.srcObject=null;$('#cameraModal').classList.remove('open');
+    }
+    async function captureDirectCamera(){
+      const video=$('#cameraVideo');if(!cameraStream||!video.videoWidth){toast('A câmera ainda está iniciando. Aguarde um instante.','bad');return}
+      const button=$('#captureCamera');button.disabled=true;button.textContent='Processando fotografia…';
+      const canvas=document.createElement('canvas');canvas.width=video.videoWidth;canvas.height=video.videoHeight;canvas.getContext('2d').drawImage(video,0,0);
+      const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.96));const target=cameraTarget,subject=cameraSubject;stopCamera();button.disabled=false;button.textContent='📸 Fotografar e ler automaticamente';
+      if(!blob){toast('Não foi possível capturar a fotografia. Tente novamente.','bad');return}
+      const scanner=target==='key'?keyScanner:studentScanner;scanner.context=subject;await scanner.load(blob);
+    }
+    $('#keyCamera').onclick=()=>openDirectCamera('key');$('#studentCamera').onclick=()=>openDirectCamera('student');$('#captureCamera').onclick=captureDirectCamera;$('#closeCamera').onclick=stopCamera;$('#cancelCamera').onclick=stopCamera;
+
+    const level=grade=>Number(grade)>=7?'Proficiente':Number(grade)>=5?'Básico':'Abaixo do básico';
+    const recordDenominator=r=>r.scope==='math-only'?COUNT:TOTAL;
+    function recordSubjectScore(r,subject){const saved=r.subjectScores?.[subject];return saved||scoreSubject(normalizeSet(r.answers)[subject],normalizeSet(r.official||official)[subject])}
+    function renderResults(){
+      const q=$('#resultSearch').value.trim().toLocaleLowerCase('pt-BR'),shown=records.filter(r=>(r.name+' '+(r.className||'')).toLocaleLowerCase('pt-BR').includes(q));
+      $('#resultsBody').innerHTML=shown.map(r=>{const p=recordSubjectScore(r,'portuguese'),m=recordSubjectScore(r,'math'),den=recordDenominator(r);return`<tr><td><b>${esc(r.name)}</b></td><td>${esc(r.className||'—')}</td><td>${m.correct}/26</td><td>${r.scope==='math-only'?'—':p.correct+'/26'}</td><td>${r.correct}/${den}</td><td class="grade">${br(r.grade)}</td><td><span class="tag ${r.percent>=50?'ok':'bad'}">${br(r.percent).replace(',00','')}%</span></td><td>${new Date(r.createdAt).toLocaleDateString('pt-BR')}</td><td><div class="actions"><button class="btn ghost small" data-view="${esc(r.id)}">Ver</button><button class="btn danger small" data-del="${esc(r.id)}">Excluir</button></div></td></tr>`}).join('');
+      $('#emptyResults').classList.toggle('hidden',shown.length>0);$('#resultsBody').closest('.table-wrap').classList.toggle('hidden',shown.length===0);
+      const total=records.length,avg=total?records.reduce((s,r)=>s+Number(r.grade||0),0)/total:0,high=total?Math.max(...records.map(r=>Number(r.grade||0))):0,pct=total?records.reduce((s,r)=>s+Number(r.percent||0),0)/total:0;
+      $('#sumCount').textContent=total;$('#sumAverage').textContent=br(avg);$('#sumHigh').textContent=br(high);$('#sumPercent').textContent=br(pct).replace(',00','')+'%';
+      $('#resultsBody').querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>showDetail(b.dataset.view));$('#resultsBody').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>deleteRecord(b.dataset.del));renderQuestionChart();renderRooms();updateRoomState();
+    }
+    function renderQuestionChart(){
+      const host=$('#questionChart');if(!records.length){host.innerHTML='<div class="empty-scan"><b>Sem dados para analisar</b></div>';return}
+      host.innerHTML=Object.keys(SUBJECTS).flatMap(subject=>Array.from({length:COUNT},(_,i)=>{const applicable=records.filter(r=>subject==='math'||r.scope!=='math-only'),attempts=applicable.length,errors=applicable.filter(r=>normalizeSet(r.answers)[subject][i]!==normalizeSet(r.official||official)[subject][i]).length,p=attempts?errors/attempts*100:0,q=SUBJECTS[subject].start+i;return `<div class="chart-row"><b>${q}</b><div class="bar"><i style="width:${p}%"></i></div><small>${errors} erro${errors===1?'':'s'} (${Math.round(p)}%)</small></div>`})).join('');
+    }
+    function renderRooms(){
+      $('#roomCount').textContent=`${rooms.length} sala${rooms.length===1?'':'s'}`;$('#emptyRooms').classList.toggle('hidden',rooms.length>0);
+      $('#roomArchive').innerHTML=rooms.map(room=>{const list=Array.isArray(room.records)?room.records:[],avg=list.length?list.reduce((n,r)=>n+Number(r.grade||0),0)/list.length:0;return `<details class="room-card"><summary><div><strong>${esc(room.className||'Sala sem nome')}</strong><span>${list.length} aluno(s) • encerrada em ${new Date(room.finishedAt).toLocaleString('pt-BR')}</span></div><div class="room-average"><b>${br(avg)}</b><small>média</small></div></summary><div class="room-body"><div class="actions"><button class="btn success small" data-roomopen="${esc(room.id)}">✎ Reabrir e continuar</button><button class="btn primary small" data-roomexcel="${esc(room.id)}">⬇ Excel horizontal</button><button class="btn dark small" data-roompdf="${esc(room.id)}">🖨 Relatório / PDF</button><button class="btn danger small" data-roomdel="${esc(room.id)}">Excluir sala</button></div><div class="room-students"><div class="head">Aluno</div><div class="head">Acertos</div><div class="head">Nota</div>${list.map(r=>`<div>${esc(r.name)}</div><div>${r.correct}/${recordDenominator(r)}</div><div><b>${br(r.grade)}</b></div>`).join('')}</div></div></details>`}).join('');
+      $$('[data-roomopen]').forEach(b=>b.onclick=()=>reopenRoom(b.dataset.roomopen));
+      $$('[data-roomexcel]').forEach(b=>b.onclick=()=>{const room=rooms.find(r=>r.id===b.dataset.roomexcel);if(room)exportExcelList(room.records||[],`turma_${safeName(room.className)}.xls`,normalizeSet(room.official||official))});
+      $$('[data-roompdf]').forEach(b=>b.onclick=()=>{const room=rooms.find(r=>r.id===b.dataset.roompdf);if(room)printReport(null,room.records||[],normalizeSet(room.official||official),room.className||'')});
+      $$('[data-roomdel]').forEach(b=>b.onclick=()=>{const room=rooms.find(r=>r.id===b.dataset.roomdel);if(room&&confirm(`Excluir definitivamente a sala ${room.className}?`)){rooms=rooms.filter(r=>r.id!==room.id);persist();renderRooms();toast('Sala excluída.')}});
+    }
+    function reopenRoom(id){
+      if(activeRoom||records.length){toast('Encerre ou exclua a sala atual antes de reabrir outra.','bad');return}
+      const room=rooms.find(r=>r.id===id);if(!room||!confirm(`Reabrir a sala ${room.className} para incluir novos alunos?`))return;
+      const roomKey=normalizeSet(room.official),currentKey=normalizeSet(official);rooms=rooms.filter(r=>r.id!==id);records=(room.records||[]).map(normalizeRecord);activeRoom={id:room.id,className:room.className||'',school:room.school||'',startedAt:room.startedAt||new Date().toISOString(),reopenedAt:new Date().toISOString()};portugueseEnabled=typeof room.portugueseEnabled==='boolean'?room.portugueseEnabled:records.some(r=>r.scope!=='math-only');official={portuguese:roomKey.portuguese.some(Boolean)?roomKey.portuguese:currentKey.portuguese,math:roomKey.math.some(Boolean)?roomKey.math:currentKey.math};savedKeys={portuguese:official.portuguese.every(Boolean),math:official.math.every(Boolean)};
+      keySubject='math';$('#studentClass').value=activeRoom.className;$('#studentSchool').value=activeRoom.school;persist();newStudent(false);renderKey();renderResults();setTab('student');toast(`Sala ${activeRoom.className} reaberta. Os alunos anteriores foram mantidos.`,'ok');
+    }
+    const safeName=s=>String(s||'sala').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'').toLowerCase();
+    $('#finishClass').onclick=()=>{
+      if(!records.length||!activeRoom){toast('Não há alunos salvos na sala atual.','bad');return}
+      if(!confirm(`Encerrar e salvar a sala ${activeRoom.className} com ${records.length} aluno(s)?`))return;
+      const ended=activeRoom.className,previousRecords=records,previousActive=activeRoom;rooms.unshift({id:activeRoom.id,className:activeRoom.className,school:activeRoom.school||'',startedAt:activeRoom.startedAt,finishedAt:new Date().toISOString(),portugueseEnabled,official:copySet(official),records:[...records]});
+      records=[];activeRoom=null;if(!persist()){rooms.shift();records=previousRecords;activeRoom=previousActive;renderResults();return}newStudent(true);renderResults();setTab('student');toast(`Sala ${ended} salva. Digite a próxima série/turma.`,'ok');
+    };
+    function showDetail(id){
+      const r=records.find(x=>x.id===id);if(!r)return;const key=normalizeSet(r.official||official),ans=normalizeSet(r.answers),p=recordSubjectScore(r,'portuguese'),m=recordSubjectScore(r,'math');$('#detailTitle').textContent='Resultado - '+r.name;
+      const subjects=r.scope==='math-only'?['math']:['math','portuguese'];$('#detailBody').innerHTML=`<div class="subject-summary"><div class="subject-score"><span>Matemática</span><strong>${m.correct}/26 • nota ${br(m.grade)}</strong></div><div class="subject-score"><span>Português</span><strong>${r.scope==='math-only'?'não registrado':p.correct+'/26 • nota '+br(p.grade)}</strong></div><div class="subject-score"><span>Nível</span><strong>${level(r.grade)}</strong></div></div><div class="score-strip"><div class="metric ok"><span>Acertos</span><strong>${r.correct}</strong></div><div class="metric bad"><span>Erros</span><strong>${r.wrong}</strong></div><div class="metric"><span>Em branco/dupla</span><strong>${r.blank}</strong></div><div class="metric"><span>Percentual</span><strong>${br(r.percent).replace(',00','')}%</strong></div><div class="metric main"><span>Nota</span><strong>${br(r.grade)}</strong></div></div><p><b>Turma:</b> ${esc(r.className||'—')} &nbsp; <b>Escola:</b> ${esc(r.school||'—')} &nbsp; <b>Data:</b> ${new Date(r.createdAt).toLocaleString('pt-BR')}</p><div class="table-wrap"><table><thead><tr><th>Matéria</th><th>Questão</th><th>Aluno</th><th>Oficial</th><th>Resultado</th></tr></thead><tbody>${subjects.flatMap(subject=>Array.from({length:COUNT},(_,i)=>{const a=ans[subject][i]||'',ok=a===key[subject][i];return `<tr><td>${SUBJECTS[subject].label}</td><td>${SUBJECTS[subject].start+i}</td><td>${esc(a||'—')}</td><td>${key[subject][i]||'—'}</td><td><span class="tag ${ok?'ok':'bad'}">${ok?'Correta':'Incorreta'}</span></td></tr>`})).join('')}</tbody></table></div><div class="actions" style="margin-top:16px"><button class="btn dark" id="printOne">🖨 Imprimir / salvar PDF</button></div>`;
+      $('#detailModal').classList.add('open');$('#printOne').onclick=()=>printReport(r);
+    }
+    function deleteRecord(id){const r=records.find(x=>x.id===id);if(r&&confirm(`Excluir o resultado de ${r.name}?`)){records=records.filter(x=>x.id!==id);persist();renderResults();toast('Resultado excluído.')}}
+    $('#resultSearch').oninput=renderResults;
+    $('#deleteAll').onclick=()=>{if(records.length&&confirm(`Excluir a sala atual com ${records.length} resultados?`)){records=[];activeRoom=null;persist();newStudent(true);renderResults();toast('Sala atual excluída.')}};
+    function exportExcelList(list,fileName,key=official){
+      if(!list.length){toast('Não há resultados para exportar.','bad');return}
+      key=normalizeSet(key);const base=['Nome','Série / Turma','Escola','Nível','Matemática - Acertos','Matemática - Nota','Português - Acertos','Português - Nota','Total - Acertos','Erros','Em branco / dupla','Nota Final','Percentual','Data'],cols=[...base,...Array.from({length:TOTAL},(_,i)=>'Q'+(i+1))];
+      const officialRow=['GABARITO OFICIAL',...Array(base.length-1).fill(''),...key.portuguese,...key.math];
+      const rows=list.map(r=>{const ans=normalizeSet(r.answers),p=recordSubjectScore(r,'portuguese'),m=recordSubjectScore(r,'math');return[r.name,r.className||'',r.school||'',level(r.grade),m.correct,br(m.grade),r.scope==='math-only'?'':p.correct,r.scope==='math-only'?'':br(p.grade),`${r.correct}/${recordDenominator(r)}`,r.wrong,r.blank,br(r.grade),br(r.percent)+'%',new Date(r.createdAt).toLocaleString('pt-BR'),...ans.portuguese,...ans.math]});
+      const tr=row=>'<tr>'+row.map(v=>`<td>${esc(v)}</td>`).join('')+'</tr>';
+      const html=`<!doctype html><html><head><meta charset="utf-8"><style>table{border-collapse:collapse;font-family:Arial;font-size:11pt}th,td{border:1px solid #777;padding:5px 7px;text-align:center;white-space:nowrap;mso-number-format:"\\@"}th{background:#0b4f8a;color:#fff}td:first-child,th:first-child{text-align:left}.official td{background:#dceeff;font-weight:bold}</style></head><body><table><thead>${tr(cols).replaceAll('<td>','<th>').replaceAll('</td>','</th>')}</thead><tbody><tr class="official">${officialRow.map(v=>`<td>${esc(v)}</td>`).join('')}</tr>${rows.map(tr).join('')}</tbody></table></body></html>`;
+      download('\ufeff'+html,fileName,'application/vnd.ms-excel;charset=utf-8');
+    }
+    $('#exportExcel').onclick=()=>exportExcelList(records,`sala_${safeName(activeRoom?.className||'atual')}_gabaritos_livro2.xls`,official);
+    $('#backupJson').onclick=()=>download(JSON.stringify({app:'Corretor Matemática e Português opcional',version:4,exportedAt:new Date().toISOString(),official,savedKeys,portugueseEnabled,records,rooms,activeRoom},null,2),'backup_corretor_gabaritos.json','application/json');
+    $('#importJson').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!Array.isArray(data.records))throw Error();const total=data.records.length+(Array.isArray(data.rooms)?data.rooms.reduce((n,r)=>n+(r.records?.length||0),0):0);if(!confirm(`Restaurar o backup com ${total} resultados? Os dados atuais serão substituídos.`))return;official=normalizeSet(data.official);savedKeys=data.savedKeys?{portuguese:!!data.savedKeys.portuguese,math:!!data.savedKeys.math}:{portuguese:official.portuguese.every(Boolean),math:official.math.every(Boolean)};records=data.records.map(normalizeRecord);portugueseEnabled=typeof data.portugueseEnabled==='boolean'?data.portugueseEnabled:records.some(r=>r.scope!=='math-only');rooms=Array.isArray(data.rooms)?data.rooms.map(room=>({...room,official:normalizeSet(room.official),records:Array.isArray(room.records)?room.records.map(normalizeRecord):[]})):[];activeRoom=data.activeRoom||null;keySubject='math';studentSubject='math';persist();if(activeRoom){$('#studentClass').value=activeRoom.className||'';$('#studentSchool').value=activeRoom.school||''}renderKey();updateStudent();renderResults();toast('Backup restaurado com sucesso.','ok')}catch{toast('Arquivo de backup inválido.','bad')}finally{e.target.value=''}};
+    function download(content,name,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+
+    function printReport(record=null,list=records,key=official,roomName=''){
+      const p=$('#printReport');if(record){const recordKey=normalizeSet(record.official||key),ans=normalizeSet(record.answers),subjects=record.scope==='math-only'?['math']:['math','portuguese'];p.innerHTML=`<h1>Relatório individual - Matemática${record.scope==='math-only'?'':' e Português'}</h1><div>${record.scope==='math-only'?'Questões 27 a 52':'Questões 1 a 52'}</div><div class="print-meta"><div><b>Estudante:</b> ${esc(record.name)}</div><div><b>Turma:</b> ${esc(record.className||'—')}</div><div><b>Data:</b> ${new Date(record.createdAt).toLocaleDateString('pt-BR')}</div></div><div class="print-scores"><div><b>Acertos</b><br>${record.correct}/${recordDenominator(record)}</div><div><b>Percentual</b><br>${br(record.percent)}%</div><div><b>Nota</b><br>${br(record.grade)}</div><div><b>Nível</b><br>${level(record.grade)}</div></div>${subjects.map(subject=>`<h2>${SUBJECTS[subject].label}</h2><div class="print-grid">${Array.from({length:COUNT},(_,i)=>{const a=ans[subject][i]||'',ok=a===recordKey[subject][i];return `<div class="print-q"><b>${SUBJECTS[subject].start+i}</b><span>Aluno: ${esc(a||'—')}</span><span>Oficial: ${recordKey[subject][i]}</span><span class="${ok?'print-ok':'print-bad'}">${ok?'Correta':'Incorreta'}</span></div>`}).join('')}</div>`).join('')}`}
+      else{key=normalizeSet(key);const avg=list.length?list.reduce((s,r)=>s+Number(r.grade||0),0)/list.length:0;p.innerHTML=`<h1>Relatório geral - ${esc(roomName||'Sala atual')}</h1><div>Matemática (27–52) • Português opcional (1–26) • Emitido em ${new Date().toLocaleString('pt-BR')}</div><p><b>Total:</b> ${list.length} aluno(s) &nbsp; <b>Média:</b> ${br(avg)}</p><table><thead><tr><th>Aluno</th><th>Turma</th><th>Matemática</th><th>Português</th><th>Total</th><th>Nota</th><th>Nível</th></tr></thead><tbody>${list.map(r=>{const ps=recordSubjectScore(r,'portuguese'),ms=recordSubjectScore(r,'math');return`<tr><td>${esc(r.name)}</td><td>${esc(r.className||'—')}</td><td>${ms.correct}/26</td><td>${r.scope==='math-only'?'—':ps.correct+'/26'}</td><td>${r.correct}/${recordDenominator(r)}</td><td>${br(r.grade)}</td><td>${level(r.grade)}</td></tr>`}).join('')}</tbody></table>${Object.keys(SUBJECTS).map(subject=>`<h2>Erros por questão — ${SUBJECTS[subject].label}</h2><div class="print-grid">${Array.from({length:COUNT},(_,i)=>{const applicable=list.filter(r=>subject==='math'||r.scope!=='math-only'),er=applicable.filter(r=>normalizeSet(r.answers)[subject][i]!==key[subject][i]).length;return `<div class="print-q"><b>${SUBJECTS[subject].start+i}</b><span>Oficial: ${key[subject][i]}</span><span>Erros: ${er}</span><span>${applicable.length?Math.round(er/applicable.length*100):0}%</span></div>`}).join('')}</div>`).join('')}`}setTimeout(()=>print(),80);
+    }
+    $('#printClass').onclick=()=>{if(records.length)printReport(null,records,official,activeRoom?.className||'Sala atual');else toast('Não há resultados para imprimir.','bad')};
+
+    function closeModals(){stopCamera();$$('.modal').forEach(m=>m.classList.remove('open'))}
+    $('#openHelp').onclick=()=>$('#helpModal').classList.add('open');$$('.helpAgain').forEach(b=>b.onclick=()=>$('#helpModal').classList.add('open'));$$('[data-close]').forEach(b=>b.onclick=()=>$('#'+b.dataset.close).classList.remove('open'));$$('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m){if(m.id==='cameraModal')stopCamera();else m.classList.remove('open')}}));addEventListener('keydown',e=>{if(e.key==='Escape')closeModals()});addEventListener('beforeunload',stopCamera);
+
+    renderKey();updateKeyStatus();updateStudent();renderResults();
+  })();
+  </script>
+</body>
+</html>
